@@ -1,0 +1,194 @@
+---
+title: "An introduction to functional programming with R"
+author: "Hon Hwang"
+date: "2019 April"
+output:
+  beamer_presentation:
+    colortheme: dove
+    theme: Antibes
+  includes: null
+  slidy_presentation: default
+---
+
+## A simple function
+Write a function that adds 100 to its argument \texttt{x}
+
+
+```{r}
+add100 <- function(x) { return(x + 100) }
+```
+
+## Passing function to function
+Functions as _first class citizen_
+
+If a function an accept a number, a \texttt{data.frame} and other
+data structures, can a function accept a function as well?
+
+\pause
+
+Write a function that
+
+  - Accepts two arguments: a value $\texttt{z}$ and a $\texttt{function}$,
+    
+  - Returns the result of calling the supplied function with the value of
+    $\texttt{z}$.
+
+## Passing function to function
+
+```{r}
+customadd <- function(z, fn) {
+  return(fn(z))
+}
+
+customadd(10, add100)
+```
+
+## 
+
+Using \texttt{do.call} to call an external function.
+
+## Passing function to function
+Write a function that calls the function in its argument, with the value
+in its argument.
+
+```{r}
+customadd2 <- function(z, fn) {
+  return( do.call(what = fn, args = list(x = z)))
+}
+```
+
+\pause
+
+<<<<<<< HEAD
+customadd2(10, add100)
+```
+
+## Passing function to function
+
+- First ability of functional programming language.
+
+- Functions as \emph{first class} citizens.
+  - Similar to other data types,
+  - Functions can be supplied to functions.
+  - Functions can return functions.
+
+## Returning a function
+
+Write a function that
+
+  - Accepts one argument: a value $\texttt{m}$,
+    
+  - Returns:
+    - A function that accepts one argument $\texttt{x}$
+    - Returns $\texttt{m}$ plus $\texttt{x}$.
+
+## Returning a function
+
+```{r}
+addfactory <- function(m) {
+  return(
+    function(x) { x + m }
+  )
+}
+
+add200 <- addfactory(200)
+add200(10)
+
+add500 <- addfactory(500)
+add500(10)
+```
+
+## Presetting values of a function
+
+```{r}
+rnorm_factory <- function(n) {
+  return(
+    function(mu, sd) { rnorm(n, mu, sd) }
+  )
+}
+
+gen1k_rnorm <- rnorm_factory(1000)
+mu2sd1 <- gen1k_rnorm(2, 1)
+mu10sd1 <- gen1k_rnorm(10, 1)
+```
+
+## Presetting values of a function
+
+```{r}
+hist(c(mu2sd1, mu10sd1))
+```
+I am changing the \emph{behaviour} of a function.
+
+## Presetting arguments using $\texttt{purrr}$
+
+Using $\texttt{partial}$ function from $\texttt{purrr}$ package.
+```{r, warning=FALSE, out.height="40%"}
+library(purrr)
+
+gen2k_rnorm <- partial(rnorm, n = 2000)
+length(gen2k_rnorm())
+
+hist(gen2k_rnorm())
+
+```
+
+##
+```{r}
+hist(gen2k_rnorm(mean = 50))
+```
+
+## The Map function
+
+Applies a function to data
+
+Rows oriented workflow slides 20 to 23
+
+  - https://speakerdeck.com/jennybc/row-oriented-workflows-in-r-with-the-tidyverse?slide=20
+
+## Walkthrough of \texttt{rnorm} examples from reference page
+
+Acts like $\texttt{lapply}$ but can return results into different formats.
+
+  - https://purrr.tidyverse.org/reference/map.html
+
+## Eliminating loops
+
+  - https://r4ds.had.co.nz/iteration.html#for-loops-vs.functionals
+  
+  - First `mtcars` example from
+    https://purrr.tidyverse.org/reference/map.html
+  
+## Changing behaviours of functions
+
+  - https://r4ds.had.co.nz/iteration.html#dealing-with-failure
+
+## Mapping over rows
+
+Create a `tibble` of params
+```{r, warning=FALSE}
+library(tibble)
+
+params_tbl <- tibble(mu = c(1,5,10), sd = c(1,0.5,0.3))
+purrr::pmap(params_tbl, function(mu,sd) {
+  rnorm(10, mu, sd)
+})
+```
+
+## For more in depth
+
+R for data science
+
+  - https://r4ds.had.co.nz/
+    
+`purrr` reference
+
+  - https://purrr.tidyverse.org/index.html
+    
+`purrr` cheatsheat
+
+  - https://github.com/rstudio/cheatsheets/blob/master/purrr.pdf
+    
+Advanced R (2nd edition)
+
+  - http://adv-r.had.co.nz/
+    
