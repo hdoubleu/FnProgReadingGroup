@@ -8,6 +8,8 @@ output:
     theme: Antibes
   includes: null
   slidy_presentation: default
+  pdf_document:
+    keep_tex: true
 ---
 
 ## A simple function
@@ -23,8 +25,6 @@ Functions as _first class citizen_
 
 If a function an accept a number, a \texttt{data.frame} and other
 data structures, can a function accept a function as well?
-
-\pause
 
 Write a function that
 
@@ -55,11 +55,7 @@ in its argument.
 customadd2 <- function(z, fn) {
   return( do.call(what = fn, args = list(x = z)))
 }
-```
 
-\pause
-
-<<<<<<< HEAD
 customadd2(10, add100)
 ```
 
