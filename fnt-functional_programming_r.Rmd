@@ -21,17 +21,15 @@ add100 <- function(x) { return(x + 100) }
 ```
 
 ## Passing function to function
-Functions as _first class citizen_
 
-If a function an accept a number, a \texttt{data.frame} and other
+If a function can accept a number, a \texttt{data.frame} and other
 data structures, can a function accept a function as well?
 
 Write a function that
 
-  - Accepts two arguments: a value $\texttt{z}$ and a $\texttt{function}$,
+  - Accepts two arguments: $\texttt{z}$, $\texttt{fn}$,
     
-  - Returns the result of calling the supplied function with the value of
-    $\texttt{z}$.
+  - Returns the result of calling `fn` with `z`. i.e., `fn(z)`
 
 ## Passing function to function
 
@@ -40,23 +38,25 @@ customadd <- function(z, fn) {
   return(fn(z))
 }
 
-customadd(10, add100)
+customadd(55, add100)
 ```
 
-## 
+If _fn_ doesn't has a name, it's called an _anonymous function_.
+
+In some other programming languages, _anonymous function_ are also called
+_lambda_ function.
+
+
+## Calling functions with `do.call` 
 
 Using \texttt{do.call} to call an external function.
-
-## Passing function to function
-Write a function that calls the function in its argument, with the value
-in its argument.
 
 ```{r}
 customadd2 <- function(z, fn) {
   return( do.call(what = fn, args = list(x = z)))
 }
 
-customadd2(10, add100)
+customadd2(55, add100)
 ```
 
 ## Passing function to function
@@ -70,13 +70,15 @@ customadd2(10, add100)
 
 ## Returning a function
 
+Let's now get a function to return a function!
 Write a function that
 
   - Accepts one argument: a value $\texttt{m}$,
     
   - Returns:
-    - A function that accepts one argument $\texttt{x}$
-    - Returns $\texttt{m}$ plus $\texttt{x}$.
+    - A function
+      - Accepts one argument $\texttt{x}$
+      - Returns $\texttt{m}$ plus $\texttt{x}$.
 
 ## Returning a function
 
@@ -86,7 +88,14 @@ addfactory <- function(m) {
     function(x) { x + m }
   )
 }
+```
 
+In _object-orientated programming_ world, these are called _factory_
+objects.
+
+## Returning a function
+
+```{r}
 add200 <- addfactory(200)
 add200(10)
 
@@ -96,10 +105,14 @@ add500(10)
 
 ## Presetting values of a function
 
+A factory function that presets the number of data points to generate.
+
 ```{r}
 rnorm_factory <- function(n) {
   return(
-    function(mu, sd) { rnorm(n, mu, sd) }
+    function(mu, sd) {
+      rnorm(n, mu, sd)
+    }
   )
 }
 
