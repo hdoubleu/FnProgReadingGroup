@@ -201,3 +201,181 @@ Advanced R (2nd edition)
 
   - http://adv-r.had.co.nz/
     
+
+## Functional programming continued - Closure
+
+Scoping
+
+```{r, scoping-intro}
+x <- 10
+
+addOneToNum <- function(num) {
+  x <- num
+  return(x + 1)
+}
+
+addOneToNum(10)
+
+```
+
+  - The first `x` resides in the global _environment_
+  - The second `x` resides inside in the _environment_ of `addOneToNum` function 
+
+## Closure - enclosing the _parent_ environment
+
+From http://adv-r.had.co.nz/Functional-programming.html#closures
+
+Create a factory function
+```{r, scoping-advr-ex}
+power <- function(exponent) {
+  function(x) {
+    x ^ exponent
+  }
+}
+```
+
+```{r, scoping-advr-ex-running}
+square <- power(2)
+square(2)
+
+cube <- power(3)
+cube(2)
+```
+
+## Closure - enclosing the _parent_ environment
+
+  - Let's look at the _environment_ where `x` resides.
+  - Add one extra line to factory function
+
+```{r, scoping-advr-ex-getenv, warning=FALSE}
+power <- function(exponent) {
+  print(environment())
+  function(x) {
+    x ^ exponent
+  }
+}
+```
+
+## Closure - enclosing the _parent_ environment
+
+> The parent environment of a closure is the execution environment of the
+> function that created it 
+
+```{r}
+square2 <- power(2)
+
+environment(square2)
+```
+
+## Closure - enclosing the _parent_ environment
+
+Let's look at the value of `x` in each of the functions
+
+```{r, scoping-advr-ex-loadpryr, warning=FALSE}
+library(pryr)
+```
+
+##
+
+```{r}
+unenclose(square)
+unenclose(cube)
+```
+
+## How to modify that `x` inside the closure
+
+  - DANGER. If you need to modify or keep _stats_, use object-orientated
+    functionalities of R.
+  - Double arrow assignment (`<<-`)  
+
+```{r, modstate-advr-ex}
+new_counter <- function() {
+  i <- 0
+  function() {
+    i <<- i + 1
+    i
+  }
+}
+```
+
+##
+
+```{r}
+counter_one <- new_counter()
+counter_two <- new_counter()
+
+counter_one()
+counter_two()
+
+counter_one()
+counter_one()
+```
+
+## MLE estimation using closures
+
+http://adv-r.had.co.nz/Functionals.html#functionals-math
+
+```{r, advr-ex-mle}
+poisson_nll <- function(x) {
+  n <- length(x)
+  sum_x <- sum(x)
+  function(lambda) {
+    n * lambda - sum_x * log(lambda) # + terms not involving lambda
+  }
+}
+
+poivals <- rpois(100, lambda = 32)
+nll1 <- poisson_nll(poivals)
+
+optimise(nll1, c(0, 100))$minimum
+```
+
+## Non-standard evaluation
+
+http://adv-r.had.co.nz/Computing-on-the-language.html
+
+```{r, out.height="40%"}
+x <- seq(0, 2 * pi, length = 100)
+sinx <- sin(x)
+plot(x, sinx, type = "l")
+```
+
+## Expressions and values
+
+  - Values: `x` and `sinx`
+  - Expression: _code used to compute_ the value. E.g., `seq` and `sin` functions
+  - To capture expressions, use `substitute` function.
+  - `deparse` function turns expression captured by `substitute` into strings.
+  
+##
+
+```{r, capture-exp}
+f <- function(x) {
+  return(substitute(x))
+}
+
+f(1:10)
+deparse(f(1:10))
+```
+
+## `library` function
+
+  - To avoid quotes when calling `library` function
+```{r, eval=FALSE}
+library(
+  deparse(substitute(ggplot2)),
+  character.only=TRUE
+)
+```
+
+## `plot` function
+
+From help of `deparse`
+
+```{r, eval=FALSE}
+myplot <-
+     function(x, y) {
+         plot(x, y, xlab = deparse(substitute(x)),
+             ylab = deparse(substitute(y)))
+     }
+```
