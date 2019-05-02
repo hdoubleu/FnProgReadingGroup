@@ -379,3 +379,66 @@ myplot <-
              ylab = deparse(substitute(y)))
      }
 ```
+
+## Useful but complicated example using `ggplot`
+
+```{r, ggplot-demo, out.height="50%"}
+library(ggplot2)
+
+ggplot(mtcars, aes(x=mpg, y=gear)) + geom_point()
+```
+Note `mpg` and `gear` are _not_ quoted; they are not characters
+
+##
+
+What if we have variables of the axis data?
+```{r, ggplot-demo-axisvars, out.height="50%"}
+xaxis <- "disp"
+yaxis <- "drat"
+
+ggplot(mtcars, aes(x=xaxis, y=yaxis)) + geom_point()
+```
+
+##
+
+Turn variables into _symbols_ first then _unquote_
+
+```{r, ggplot-demo-axisvars-symb, out.height="50%"}
+xaxis_sym <- sym("disp")
+yaxis_sym <- sym("drat")
+
+ggplot(mtcars) + geom_point(aes(!!xaxis_sym, !!yaxis_sym))
+```
+
+## Simpler version (but deprecated)
+
+See help on `aes_string`
+https://cran.r-project.org/web/packages/ggplot2/ggplot2.pdf
+
+```{r, ggplot-demo-axisvars-aesstr, out.height="50%"}
+xaxis <- "disp"
+yaxis <- "drat"
+
+ggplot(mtcars) + geom_point(aes_string(x = xaxis, y = yaxis))
+```
+
+## Tidy evaluation in 5 minutes
+
+https://youtu.be/nERXS3ssntw
+
+## Domain specific language
+
+Walk through parts of LaTeX and HTML code generation from
+
+http://adv-r.had.co.nz/dsl.html#html
+
+Hints on possibly how `RShiny` generates all those user interface.
+
+## Domain specific language done by other functional programming language
+
+Racket was created to make this web site on typography
+https://practicaltypography.com/how-this-book-was-made.html
+
+A great article on why use functional programming languages like Lisp
+https://practicaltypography.com/why-racket-why-lisp.html
+
